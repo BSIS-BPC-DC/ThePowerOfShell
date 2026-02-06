@@ -1,2 +1,2 @@
 # ThePowerOfShell
-Core PowerShell commands for ctf/pentesting
+Core Ps1 commands for ctf/pentesting
