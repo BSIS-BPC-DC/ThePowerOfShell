@@ -1,6 +1,8 @@
 
 === CORE Ps1 COMMANDS FOR CTF/PENTESTING ===
 
+#Know your environment 
+$PSVersionTable.PSVersion
 
 1. Basic System Enumeration
 whoami
