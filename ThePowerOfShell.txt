@@ -80,8 +80,8 @@ Set-MpPreference -DisableRealtimeMonitoring $true -DisableIOAVProtection $true -
 
 14. Check if everything (services) is off
 Get-MpComputerStatus | Select-Object RealTimeProtectionEnabled, AntivirusEnabled, IsTamperProtected
-(RealTimeProtectionEnabled: Should be False.
-AntivirusEnabled: Should be False.
+( RealTimeProtectionEnabled: Should be False.
+AntivirusEnabled: Should be False. )
 
 15. Uninstall Defender (Windows Server Only)
 Uninstall-WindowsFeature -Name Windows-Defender
