@@ -72,6 +72,22 @@ Get-MpComputerStatus
 Get-MpComputerStatus
 Get-MpPreference
 
+12. Disable Defender Real-Time Monitoring
+Set-MpPreference -DisableRealtimeMonitoring $true
+
+13. Disable Defender All Major Features
+Set-MpPreference -DisableRealtimeMonitoring $true -DisableIOAVProtection $true -DisableBehaviorMonitoring $true -DisableBlockAtFirstSeen $true -DisableIntrusionPreventionSystem $true -DisableIOAVProtection $true -DisableScriptScanning $true
+
+14. Check if everything (services) is off
+Get-MpComputerStatus | Select-Object RealTimeProtectionEnabled, AntivirusEnabled, IsTamperProtected
+(RealTimeProtectionEnabled: Should be False.
+AntivirusEnabled: Should be False.
+
+15. Uninstall Defender (Windows Server Only)
+Uninstall-WindowsFeature -Name Windows-Defender
+
+
+
 =============================
 
 
