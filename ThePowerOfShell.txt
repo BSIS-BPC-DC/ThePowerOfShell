@@ -86,6 +86,36 @@ AntivirusEnabled: Should be False. )
 15. Uninstall Defender (Windows Server Only)
 Uninstall-WindowsFeature -Name Windows-Defender
 
+#RDP
+1. Define the user and the password directly
+$UserName = "RDP_User"
+$Pass = ConvertTo-SecureString "SecurePass123!" -AsPlainText -Force
+
+2. Create the user
+New-LocalUser -Name $UserName -Password $Pass -FullName "Remote Access"
+
+3. Add to the RDP group
+Add-LocalGroupMember -Group "Remote Desktop Users" -Member $UserName
+
+4. Open the 'Remote Desktop' door
+Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+
+5. Delete account entirely 
+Remove-LocalUser -Name "RDP_User"
+
+6. Revoke RDP Access only (Keep the user)
+Remove-LocalGroupMember -Group "Remote Desktop Users" -Member "RDP_User"
+
+#View RDP Accounts
+1. See All Local Accounts
+Get-LocalUser
+
+2. See ONLY the RDP "VIP List"
+Get-LocalGroupMember -Group "Remote Desktop Users"
+
+3. The "Search and Find" (For specific names)
+Get-LocalUser -Name "RDP_User*"
 
 
 =============================
