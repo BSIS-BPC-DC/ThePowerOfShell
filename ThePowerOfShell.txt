@@ -3,6 +3,8 @@
 
 #Know your environment 
 $PSVersionTable.PSVersion
+ *in CMD
+powershell -command $PSVersionTable.PSVersion
 
 1. Basic System Enumeration
 whoami
