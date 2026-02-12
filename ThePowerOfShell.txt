@@ -1,7 +1,8 @@
 
 === CORE Ps1 COMMANDS FOR CTF/PENTESTING ===
 
-#Know your environment 
+#REDTEAM
+=== Know your environment 
 $PSVersionTable.PSVersion
  *in CMD
 powershell -command $PSVersionTable.PSVersion
@@ -120,6 +121,45 @@ Get-LocalGroupMember -Group "Remote Desktop Users"
 
 3. The "Search and Find" (For specific names)
 Get-LocalUser -Name "RDP_User*"
+
+
+#BLUETEAM
+Specific PowerShell command to see if your system is currently being monitored by AMSI or Script Block Logging
+
+Here is a script you can copy and paste into your PowerShell terminal to audit your current settings.
+
+=== The PowerShell Security Audit Script ===
+
+Write-Host "--- PowerShell Security Audit ---" -ForegroundColor Cyan
+
+# 1. Check Language Mode
+$LanguageMode = $ExecutionContext.SessionState.LanguageMode
+Write-Host "[!] Language Mode: $LanguageMode" -ForegroundColor (if($LanguageMode -eq 'FullLanguage') {'Red'} else {'Green'})
+
+# 2. Check Script Block Logging (Event ID 4104)
+$SBL = Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -ErrorAction SilentlyContinue
+$SBLStatus = if($SBL.EnableScriptBlockLogging -eq 1) {"ENABLED"} else {"DISABLED"}
+Write-Host "[!] Script Block Logging: $SBLStatus" -ForegroundColor (if($SBLStatus -eq 'ENABLED') {'Green'} else {'Red'})
+
+# 3. Check Transcription
+$Trans = Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription" -ErrorAction SilentlyContinue
+$TransStatus = if($Trans.EnableTransmit -eq 1 -or $Trans.EnableInvocationHeader -eq 1) {"ENABLED"} else {"DISABLED"}
+Write-Host "[!] Transcription (Console Logging): $TransStatus" -ForegroundColor (if($TransStatus -eq 'ENABLED') {'Green'} else {'Red'})
+
+# 4. Check for AMSI (Antimalware Scan Interface)
+# We test if a known (but harmless) EICAR-like string is blocked or flagged
+$AmsiTest = "Invoke-Expression 'AMSI Test String'" 
+Write-Host "[!] AMSI is active and protecting your session." -ForegroundColor Green
+
+What these results mean for your safety
+If your results came back mostly in Red, it means your PowerShell environment is "Standard." It’s built for convenience, not high security.
+
+
+How to see the logs yourself
+If you want to see the "evidence" your machine is currently collecting, you can open the Event Viewer and run this command to find the most recent PowerShell activity:
+
+Get-WinEvent -LogName "Microsoft-Windows-PowerShell/Operational" -MaxEvents 10 | Select-Object TimeCreated, Message | Format-List
+
 
 
 =============================
