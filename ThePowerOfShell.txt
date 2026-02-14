@@ -8,7 +8,6 @@ $PSVersionTable.PSVersion
 powershell -command $PSVersionTable.PSVersion
 
 1. Basic System Enumeration
-set
 whoami
 hostname
 systeminfo
@@ -158,6 +157,8 @@ Write-Host "[!] Transcription (Console Logging): $TransStatus" -ForegroundColor 
 # We test if a known (but harmless) EICAR-like string is blocked or flagged
 $AmsiTest = "Invoke-Expression 'AMSI Test String'" 
 Write-Host "[!] AMSI is active and protecting your session." -ForegroundColor Green
+
+save as check.ps1
 
 What these results mean for your safety
 If your results came back mostly in Red, it means your PowerShell environment is "Standard." It’s built for convenience, not high security.
