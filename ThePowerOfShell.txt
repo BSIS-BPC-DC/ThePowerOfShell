@@ -175,23 +175,56 @@ Here is a script you can copy and paste into your PowerShell terminal to audit y
 Write-Host "--- PowerShell Security Audit ---" -ForegroundColor Cyan
 
 # 1. Check Language Mode
+# Note: 'FullLanguage' is standard for Admins. 'ConstrainedLanguage' is more secure for standard users.
 $LanguageMode = $ExecutionContext.SessionState.LanguageMode
-Write-Host "[!] Language Mode: $LanguageMode" -ForegroundColor (if($LanguageMode -eq 'FullLanguage') {'Red'} else {'Green'})
+$LMColor = if ($LanguageMode -eq 'FullLanguage') { 'Red' } else { 'Green' }
+Write-Host "[!] Language Mode: $LanguageMode" -ForegroundColor $LMColor
 
 # 2. Check Script Block Logging (Event ID 4104)
-$SBL = Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging" -ErrorAction SilentlyContinue
-$SBLStatus = if($SBL.EnableScriptBlockLogging -eq 1) {"ENABLED"} else {"DISABLED"}
-Write-Host "[!] Script Block Logging: $SBLStatus" -ForegroundColor (if($SBLStatus -eq 'ENABLED') {'Green'} else {'Red'})
+$SBLPath = "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\ScriptBlockLogging"
+if (Test-Path $SBLPath) {
+    $SBL = Get-ItemProperty -Path $SBLPath -ErrorAction SilentlyContinue
+    $SBLStatus = if ($SBL.EnableScriptBlockLogging -eq 1) { "ENABLED" } else { "DISABLED" }
+} else {
+    $SBLStatus = "DISABLED (Registry Key Not Found)"
+}
+$SBLColor = if ($SBLStatus -eq 'ENABLED') { 'Green' } else { 'Red' }
+Write-Host "[!] Script Block Logging: $SBLStatus" -ForegroundColor $SBLColor
 
 # 3. Check Transcription
-$Trans = Get-ItemProperty -Path "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription" -ErrorAction SilentlyContinue
-$TransStatus = if($Trans.EnableTransmit -eq 1 -or $Trans.EnableInvocationHeader -eq 1) {"ENABLED"} else {"DISABLED"}
-Write-Host "[!] Transcription (Console Logging): $TransStatus" -ForegroundColor (if($TransStatus -eq 'ENABLED') {'Green'} else {'Red'})
+$TransPath = "HKLM:\Software\Policies\Microsoft\Windows\PowerShell\Transcription"
+if (Test-Path $TransPath) {
+    $Trans = Get-ItemProperty -Path $TransPath -ErrorAction SilentlyContinue
+    # CORRECTED: Registry value is 'EnableTranscripting', not 'EnableTransmit'
+    $TransStatus = if ($Trans.EnableTranscripting -eq 1) { "ENABLED" } else { "DISABLED" }
+} else {
+    $TransStatus = "DISABLED (Registry Key Not Found)"
+}
+$TransColor = if ($TransStatus -eq 'ENABLED') { 'Green' } else { 'Red' }
+Write-Host "[!] Transcription (Console Logging): $TransStatus" -ForegroundColor $TransColor
 
 # 4. Check for AMSI (Antimalware Scan Interface)
-# We test if a known (but harmless) EICAR-like string is blocked or flagged
-$AmsiTest = "Invoke-Expression 'AMSI Test String'" 
-Write-Host "[!] AMSI is active and protecting your session." -ForegroundColor Green
+# We reconstruct the test string at runtime so this script file isn't deleted by antivirus immediately.
+$Part1 = 'AMSI Test Sample: '
+$Part2 = '7e72c343-9e55-4093-7955-aa213df8802d'
+$TestString = $Part1 + $Part2
+
+Write-Host "[-] Testing AMSI..." -NoNewline
+try {
+    # We try to invoke the test string. If AMSI is working, it should THROW an error.
+    Invoke-Expression $TestString | Out-Null
+    
+    # If we get here, AMSI failed to catch it.
+    Write-Host " FAILED (AMSI did not block the test string)" -ForegroundColor Red
+}
+catch {
+    # If the error contains "malicious", AMSI is working!
+    if ($_.Exception.Message -match "malicious") {
+        Write-Host " SUCCESS (AMSI blocked the test string)" -ForegroundColor Green
+    } else {
+        Write-Host " UNKNOWN ERROR ($($_.Exception.Message))" -ForegroundColor Yellow
+    }
+}
 
 save as check.ps1
 
