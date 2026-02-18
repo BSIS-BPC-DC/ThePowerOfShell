@@ -233,18 +233,16 @@ If your results came back mostly in Red, it means your PowerShell environment is
 
 
 How to see the logs yourself
-If you want to see the "evidence" your machine is currently collecting, you can open the Event Viewer and run this command to find the most recent PowerShell activity:
+If you want to see the "evidence" your machine is currently collecting, you can open the Event Viewer and run this command to find the most recent PowerShell activity (Especially commands that are executed):
 
-Get-WinEvent -LogName "Microsoft-Windows-PowerShell/Operational" -MaxEvents 10 | Select-Object TimeCreated, Message | Format-List
+Get-WinEvent -LogName "Microsoft-Windows-PowerShell/Operational" -FilterXPath "*[System[(EventID=4104)]]" -MaxEvents 10 | Select-Object TimeCreated, Message | Format-List
 
 
 
 =============================
 
 
-"...Keep on learning
- Keep on training 
- Keep on getting smarter"
+"...Keep on learning,Keep on training, Keep on getting smarter"
 - Oliver Queen
 Arrow (U.S. TV series)
 
