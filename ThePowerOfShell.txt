@@ -242,7 +242,7 @@ Get-WinEvent -LogName "Microsoft-Windows-PowerShell/Operational" -FilterXPath "*
 =============================
 
 
-"...Keep on learning,Keep on training, Keep on getting smarter"
+"...keep learning, keep training, keep getting smarter"
 - Oliver Queen
 Arrow (U.S. TV series)
 
